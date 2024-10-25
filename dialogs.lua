@@ -7,6 +7,8 @@ local _ = require("gettext")
 local queryChatGPT = require("gpt_query")
 
 local CONFIGURATION = nil
+local buttons, input_dialog
+
 local success, result = pcall(function() return require("configuration") end)
 if success then
   CONFIGURATION = result
@@ -61,48 +63,38 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
   }}
 
   local function handleNewQuestion(chatgpt_viewer, question)
-    -- Add the new question to the message history
     table.insert(message_history, {
       role = "user",
       content = question
     })
 
-    -- Send the query to ChatGPT with the updated message_history
     local answer = queryChatGPT(message_history)
 
-    -- Add the answer to the message history
     table.insert(message_history, {
       role = "assistant",
       content = answer
     })
 
-    -- Update the result text
     local result_text = createResultText(highlightedText, message_history)
 
-    -- Update the text and refresh the viewer
     chatgpt_viewer:update(result_text)
   end
 
-  local input_dialog
-  input_dialog = InputDialog:new{
-    title = _("Ask a question about the highlighted text"),
-    input_hint = _("Type your question here..."),
-    input_type = "text",
-    buttons = {{{
+  buttons = {
+    {
       text = _("Cancel"),
       callback = function()
         UIManager:close(input_dialog)
       end
-    }, {
+    },
+    {
       text = _("Ask"),
       callback = function()
         local question = input_dialog:getInputText()
         UIManager:close(input_dialog)
         showLoadingDialog()
 
-        -- do the actual work after a short delay to allow the loading dialog to show
         UIManager:scheduleIn(0.1, function()
-          -- Give context to the question
           local context_message = {
             role = "user",
             content = "I'm reading something titled '" .. title .. "' by " .. author ..
@@ -110,7 +102,6 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
           }
           table.insert(message_history, context_message)
 
-          -- Ask the question
           local question_message = {
             role = "user",
             content = question
@@ -118,7 +109,6 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
           table.insert(message_history, question_message)
 
           local answer = queryChatGPT(message_history)
-          -- Save the answer to the message history
           local answer_message = {
             role = "assistant",
             content = answer
@@ -136,26 +126,23 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
           UIManager:show(chatgpt_viewer)
         end)
       end
-    }, {
+    }
+  }
+
+  if CONFIGURATION and CONFIGURATION.features and CONFIGURATION.features.translate_to then
+    table.insert(buttons, {
       text = _("Translate"),
       callback = function()
         showLoadingDialog()
 
         UIManager:scheduleIn(0.1, function()
-          local translated_text
-          if CONFIGURATION and CONFIGURATION.features and CONFIGURATION.features.translate_to then
-            translated_text = translateText(highlightedText, CONFIGURATION.features.translate_to)
-          else
-            translated_text = _("Translation configuration not found.")
-          end
+          local translated_text = translateText(highlightedText, CONFIGURATION.features.translate_to)
 
-          -- Add the translation request to message history
           table.insert(message_history, {
             role = "user",
-            content = "Translate to " .. (CONFIGURATION.features.translate_to or "unknown language") .. ": " .. highlightedText
+            content = "Translate to " .. CONFIGURATION.features.translate_to .. ": " .. highlightedText
           })
 
-          -- Add the translation response to message history
           table.insert(message_history, {
             role = "assistant",
             content = translated_text
@@ -171,7 +158,14 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
           UIManager:show(chatgpt_viewer)
         end)
       end
-    }}}
+    })
+  end
+
+  input_dialog = InputDialog:new{
+    title = _("Ask a question about the highlighted text"),
+    input_hint = _("Type your question here..."),
+    input_type = "text",
+    buttons = {buttons}
   }
   UIManager:show(input_dialog)
 end

@@ -39,6 +39,19 @@ local CONFIGURATION = {
 return CONFIGURATION
 ```
 
+Additionally, as other extra features are rolled out, they will be optional and can be set in the `features` table in the `configuration.lua` file. For example, if you want to use the `translate_to` parameter, you can set it in the `features` table like so:
+
+```lua
+local CONFIGURATION = {
+    api_key = "YOUR_API_KEY",
+    model = "gpt-4o-mini",
+    base_url = "https://api.openai.com/v1/chat/completions"
+    features = {
+        translate_to = "French"
+    }
+}
+```
+
 If you clone this project, you should be able to put the directory, `askgpt.koplugin`, in the `koreader/plugins` directory and it should work. If you want to use the plugin without cloning the project, you can download the zip file from the releases page and extract the `askgpt.koplugin` directory to the `koreader/plugins` directory. If for some reason you extract the files of this repository in another directory, rename it before moving it to the `koreader/plugins` directory.
 
 ## How To Use
@@ -46,5 +59,7 @@ If you clone this project, you should be able to put the directory, `askgpt.kopl
 To use AskGPT, simply highlight the text that you want to ask a question about, and select "Ask ChatGPT" from the menu. The plugin will then send your highlighted text to the ChatGPT API, and display the answer to your question in a pop-up window.
 
 I hope you enjoy using this plugin and that it enhances your e-reading experience. If you have any feedback or suggestions, please let me know!
+
+If you want to support development, become a [Sponsor on GitHub](https://github.com/sponsors/drewbaumann).
 
 License: GPLv3
