@@ -4,6 +4,7 @@ local NetworkMgr = require("ui/network/manager")
 local _ = require("gettext")
 
 local showChatGPTDialog = require("dialogs")
+local UpdateChecker = require("update_checker")
 
 local AskGPT = InputContainer:new {
   name = "askgpt",
@@ -16,7 +17,10 @@ function AskGPT:init()
       text = _("Ask ChatGPT"),
       enabled = Device:hasClipboard(),
       callback = function()
-        NetworkMgr:runWhenOnline(function() showChatGPTDialog(self.ui, _reader_highlight_instance.selected_text.text) end)
+        NetworkMgr:runWhenOnline(function()
+          UpdateChecker.checkForUpdates()
+          showChatGPTDialog(self.ui, _reader_highlight_instance.selected_text.text)
+        end)
       end,
     }
   end)
