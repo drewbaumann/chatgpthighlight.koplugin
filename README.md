@@ -61,6 +61,21 @@ local CONFIGURATION = {
 }
 ```
 
+### Changing the default system directives
+
+You can control the default system behaviour by setting the `chat_system_directive` and/or `translation_system_directive` parameters in the `features` table. For example, for language learning, it can be useful to get information about grammar or vocabulary in addition of a direct translation.
+
+```lua
+local CONFIGURATION = {
+    api_key = "YOUR_API_KEY",
+    model = "gpt-4o-mini",
+    base_url = "https://api.openai.com/v1/chat/completions",
+    features = {
+        chat_system_directive = "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly. Answer as concisely as possible.",
+        translation_system_directive = "You are a helpful translation assistant. Provide direct translations without additional commentary.",
+    }
+```
+
 ## Installation
 
 If you clone this project, you should be able to put the directory, `askgpt.koplugin`, in the `koreader/plugins` directory and it should work. If you want to use the plugin without cloning the project, you can download the zip file from the releases page and extract the `askgpt.koplugin` directory to the `koreader/plugins` directory. If for some reason you extract the files of this repository in another directory, rename it before moving it to the `koreader/plugins` directory.

@@ -24,7 +24,7 @@ local function translateText(text, target_language)
   local translation_history = {
     {
       role = "system",
-      content = "You are a helpful translation assistant. Provide direct translations without additional commentary."
+      content = CONFIGURATION and CONFIGURATION.features and CONFIGURATION.features.translation_system_directive or "You are a helpful translation assistant. Provide direct translations without additional commentary."
     },
     translation_message
   }
@@ -59,7 +59,7 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
     ui.document:getProps().authors or _("Unknown Author")
   local message_history = message_history or {{
     role = "system",
-    content = "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly. Answer as concisely as possible."
+    content = CONFIGURATION and CONFIGURATION.features and CONFIGURATION.features.chat_system_directive or "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly. Answer as concisely as possible."
   }}
 
   local function handleNewQuestion(chatgpt_viewer, question)
