@@ -68,15 +68,22 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
       content = question
     })
 
-    local answer = queryChatGPT(message_history)
+    local success, result = queryChatGPT(message_history)
+
+    if not success then
+      UIManager:show(InfoMessage:new{
+        text = result, -- Show error message
+        timeout = 3,
+      })
+      return
+    end
 
     table.insert(message_history, {
       role = "assistant",
-      content = answer
+      content = result
     })
 
     local result_text = createResultText(highlightedText, message_history)
-
     chatgpt_viewer:update(result_text)
   end
 
@@ -108,10 +115,19 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
           }
           table.insert(message_history, question_message)
 
-          local answer = queryChatGPT(message_history)
+          local success, result = queryChatGPT(message_history)
+
+          if not success then
+            UIManager:show(InfoMessage:new{
+              text = result,
+              timeout = 3,
+            })
+            return
+          end
+
           local answer_message = {
             role = "assistant",
-            content = answer
+            content = result
           }
           table.insert(message_history, answer_message)
 

@@ -65,11 +65,19 @@ local function queryChatGPT(message_history)
   }
 
   if code ~= 200 then
-    error("Error querying ChatGPT API: " .. code)
+    return false, "Error querying ChatGPT API (HTTP " .. code .. "): " .. table.concat(responseBody)
   end
 
-  local response = json.decode(table.concat(responseBody))
-  return response.choices[1].message.content
+  local success, response = pcall(json.decode, table.concat(responseBody))
+  if not success then
+    return false, "Failed to parse API response: " .. response
+  end
+
+  if not response.choices or not response.choices[1] or not response.choices[1].message then
+    return false, "Invalid response format from API"
+  end
+
+  return true, response.choices[1].message.content
 end
 
 return queryChatGPT
