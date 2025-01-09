@@ -83,6 +83,7 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
   buttons = {
     {
       text = _("Cancel"),
+      id = "close",
       callback = function()
         UIManager:close(input_dialog)
       end
