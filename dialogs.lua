@@ -16,19 +16,12 @@ else
   print("configuration.lua not found, skipping...")
 end
 
-local function translateText(text, target_language)
-  local translation_message = {
-    role = "user",
-    content = "Translate the following text to " .. target_language .. ": " .. text
+local function showLoadingDialog()
+  local loading = InfoMessage:new{
+    text = _("Loading..."),
+    timeout = 0.1
   }
-  local translation_history = {
-    {
-      role = "system",
-      content = "You are a helpful translation assistant. Provide direct translations without additional commentary."
-    },
-    translation_message
-  }
-  return queryChatGPT(translation_history)
+  UIManager:show(loading)
 end
 
 local function createResultText(highlightedText, message_history)
@@ -45,12 +38,83 @@ local function createResultText(highlightedText, message_history)
   return result_text
 end
 
-local function showLoadingDialog()
-  local loading = InfoMessage:new{
-    text = _("Loading..."),
-    timeout = 0.1
+local function showPromptSelectionDialog(callback)
+  local prompt_buttons = {}
+  local prompt_dialog
+
+  for _i, prompt in ipairs(CONFIGURATION.prompts) do
+    table.insert(prompt_buttons, {
+      text = _(prompt.name),
+      callback = function()
+        UIManager:close(input_dialog)
+        showLoadingDialog()
+
+        UIManager:scheduleIn(0.1, function()
+          callback(prompt.prompt)
+        end)
+      end
+    })
+  end
+
+  table.insert(prompt_buttons, {
+    text = _("Cancel"),
+    id = "close",
+    callback = function()
+      UIManager:close(prompt_dialog)
+    end
+  })
+
+  prompt_dialog = InputDialog:new{
+    title = _("Select a custom prompt"),
+    buttons = {prompt_buttons},
+    input_type = "none"
   }
-  UIManager:show(loading)
+  UIManager:show(prompt_dialog)
+end
+
+local function executeCustomPrompt(highlightedText, prompt, message_history)
+  local custom_message = {
+    role = "user",
+    content = prompt .. ": " .. highlightedText
+  }
+  local custom_history = {
+    {
+      role = "system",
+      content = "You are a helpful assistant. Execute the task as described in the prompt."
+    },
+    custom_message
+  }
+  local answer = queryChatGPT(custom_history)
+
+  table.insert(message_history, custom_message)
+  table.insert(message_history, {
+    role = "assistant",
+    content = answer
+  })
+
+  local result_text = createResultText(highlightedText, message_history)
+  local chatgpt_viewer = ChatGPTViewer:new {
+    title = _("Custom Prompt Response"),
+    text = result_text,
+    onAskQuestion = handleNewQuestion
+  }
+
+  UIManager:show(chatgpt_viewer)
+end
+
+local function translateText(text, target_language)
+  local translation_message = {
+    role = "user",
+    content = "Translate the following text to " .. target_language .. ": " .. text
+  }
+  local translation_history = {
+    {
+      role = "system",
+      content = "You are a helpful translation assistant. Provide direct translations without additional commentary."
+    },
+    translation_message
+  }
+  return queryChatGPT(translation_history)
 end
 
 local function showChatGPTDialog(ui, highlightedText, message_history)
@@ -156,6 +220,17 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
           }
 
           UIManager:show(chatgpt_viewer)
+        end)
+      end
+    })
+  end
+
+  if CONFIGURATION and CONFIGURATION.prompts then
+    table.insert(buttons, {
+      text = _("Custom Prompt"),
+      callback = function()
+        showPromptSelectionDialog(function(selected_prompt)
+          executeCustomPrompt(highlightedText, selected_prompt, message_history)
         end)
       end
     })

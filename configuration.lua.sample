@@ -3,6 +3,20 @@ local CONFIGURATION = {
     model = "gpt-4o-mini",
     base_url = "https://api.openai.com/v1/chat/completions",
     additional_parameters = {},
+    prompts = {
+        {
+            name = "Summarize Text",
+            prompt = "Summarize the following text"
+        },
+        {
+            name = "ELI5",
+            prompt = "Explain the following as if I'm a five-year-old"
+        },
+        {
+            name = "Find Key Points",
+            prompt = "List the key points from the following text"
+        }
+    }
 }
 
 return CONFIGURATION

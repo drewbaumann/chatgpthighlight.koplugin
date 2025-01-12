@@ -61,6 +61,23 @@ local CONFIGURATION = {
 }
 ```
 
+### Custom Prompts
+
+You can add predefined prompts for specific tasks in the `configuration.lua` file. This allows you to customize the type of inquiries you can make based on your usual needs.
+
+```lua
+local CONFIGURATION = {
+    api_key = "YOUR_API_KEY",
+    model = "gpt-4o-mini",
+    base_url = "https://api.openai.com/v1/chat/completions",
+    prompts = {
+        { name = "Summarize Text", prompt = "Please summarize the following text." },
+        { name = "ELI5", prompt = "Explain like I'm five: "},
+        { name = "Find Key Points", prompt = "List the key points in the following content." }
+    }
+}
+```
+
 ## Installation
 
 If you clone this project, you should be able to put the directory, `askgpt.koplugin`, in the `koreader/plugins` directory and it should work. If you want to use the plugin without cloning the project, you can download the zip file from the releases page and extract the `askgpt.koplugin` directory to the `koreader/plugins` directory. If for some reason you extract the files of this repository in another directory, rename it before moving it to the `koreader/plugins` directory.
