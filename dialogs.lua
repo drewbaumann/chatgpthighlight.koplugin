@@ -52,7 +52,7 @@ local function summaryText(text, target_language)
   local summary_history = {
     {
       role = "system",
-      content = "You are a helpful translation assistant. Provide direct summary without commentary . make it clear, understandable, and as natural as possible like native."
+      content = "You are a helpful summary assistant. Provide direct summary without commentary. make it clear, understandable, and as natural as possible like native."
     },
     summary_message
   }
