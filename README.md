@@ -61,6 +61,24 @@ local CONFIGURATION = {
 }
 ```
 
+### Summarize 
+To enable summarize, you can set the `summary` parameter in the `features` table. 
+By setting if you have `translate_to` parameter, it will automatically summarize the text then translate to the language you specify.
+
+the default `summary` value is `false`.
+
+```lua
+local CONFIGURATION = {
+    api_key = "YOUR_API_KEY",
+    model = "gpt-4o-mini",
+    base_url = "https://api.openai.com/v1/chat/completions",
+    features = {
+        translate_to = "French",
+        summary = true
+    }
+}
+```
+
 ## Installation
 
 If you clone this project, you should be able to put the directory, `askgpt.koplugin`, in the `koreader/plugins` directory and it should work. If you want to use the plugin without cloning the project, you can download the zip file from the releases page and extract the `askgpt.koplugin` directory to the `koreader/plugins` directory. If for some reason you extract the files of this repository in another directory, rename it before moving it to the `koreader/plugins` directory.

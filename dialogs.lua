@@ -16,6 +16,10 @@ else
   print("configuration.lua not found, skipping...")
 end
 
+local function isStringEmptyOrNil(str)
+    return str == nil or str == ""
+end
+
 local function translateText(text, target_language)
   local translation_message = {
     role = "user",
@@ -24,11 +28,35 @@ local function translateText(text, target_language)
   local translation_history = {
     {
       role = "system",
-      content = "You are a helpful translation assistant. Provide direct translations without additional commentary."
+      content = "You are a helpful translation assistant. Provide direct translations without additional commentary. make it clear, understandable, and as natural as possible like native."
     },
     translation_message
   }
   return queryChatGPT(translation_history)
+end
+
+
+local function summaryText(text, target_language)
+  local target_language_isNullOrEmpty = isStringEmptyOrNil(target_language)
+  local content = ""
+  if target_language_isNullOrEmpty then
+        content = "Create a concise summary capturing the key points of this text: " .. text
+  else 
+        content = "Create a concise summary in " .. target_language .. " language: " .. text
+  end
+  
+  local summary_message = {
+    role = "user",
+    content = content
+  }
+  local summary_history = {
+    {
+      role = "system",
+      content = "Create clear and concise summaries focusing on essential information only."
+    },
+    summary_message
+  }
+  return queryChatGPT(summary_history)
 end
 
 local function createResultText(highlightedText, message_history)
@@ -160,6 +188,39 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
       end
     })
   end
+
+
+  if CONFIGURATION and CONFIGURATION.features and (CONFIGURATION.features.summary==true) then
+    table.insert(buttons, {
+      text = _("Summary"),
+      callback = function()
+        showLoadingDialog()
+
+        UIManager:scheduleIn(0.1, function()
+          local summary_text = summaryText(highlightedText, CONFIGURATION.features.translate_to)
+
+          table.insert(message_history, {
+            role = "user",
+            content = "Summary of: " .. highlightedText
+          })
+
+          table.insert(message_history, {
+            role = "assistant",
+            content = summary_text
+          })
+
+          local result_text = createResultText(highlightedText, message_history)
+          local chatgpt_viewer = ChatGPTViewer:new {
+            title = _("Summary"),
+            text = result_text,
+            onAskQuestion = handleNewQuestion
+          }
+
+          UIManager:show(chatgpt_viewer)
+        end)
+      end
+    })
+    end
 
   input_dialog = InputDialog:new{
     title = _("Ask a question about the highlighted text"),
