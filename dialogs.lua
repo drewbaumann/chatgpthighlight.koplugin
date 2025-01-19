@@ -31,6 +31,28 @@ local function translateText(text, target_language)
   return queryChatGPT(translation_history)
 end
 
+
+local function summaryText(text, target_language)
+  target_languange_isNullOrEmpty = isStringEmptyOrNil(target_language)
+  content = ""
+  if target_language_isNullOrEmpty then
+    content = "Summarize the following text, highlighting the main points and key takeaways:" .. text
+  else 
+    content = "Summarize the following text using ".. target_language .." language, highlighting the main points and key takeaways:" .. text
+  local summary_message = {
+    role = "user",
+    content = content
+  }
+  local summary_history = {
+    {
+      role = "system",
+      content = "You are a helpful translation assistant. Provide direct summary without commentary . make it clear, understandable, and as natural as possible like native."
+    },
+    summary_message
+  }
+  return queryChatGPT(summary_history)
+end
+
 local function createResultText(highlightedText, message_history)
   local result_text = _("Highlighted text: ") .. "\"" .. highlightedText .. "\"\n\n"
 
@@ -160,6 +182,39 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
       end
     })
   end
+
+
+  if CONFIGURATION and CONFIGURATION.features and CONFIGURATION.features.summary then
+    table.insert(buttons, {
+      text = _("Summary"),
+      callback = function()
+        showLoadingDialog()
+
+        UIManager:scheduleIn(0.1, function()
+          local summary_text = summaryText(highlightedText, CONFIGURATION.features.translate_to)
+
+          table.insert(message_history, {
+            role = "user",
+            content = "Summary of: " .. highlightedText
+          })
+
+          table.insert(message_history, {
+            role = "assistant",
+            content = summary_text
+          })
+
+          local result_text = createResultText(highlightedText, message_history)
+          local chatgpt_viewer = ChatGPTViewer:new {
+            title = _("Summary"),
+            text = result_text,
+            onAskQuestion = handleNewQuestion
+          }
+
+          UIManager:show(chatgpt_viewer)
+        end)
+      end
+    })
+    end
 
   input_dialog = InputDialog:new{
     title = _("Ask a question about the highlighted text"),
