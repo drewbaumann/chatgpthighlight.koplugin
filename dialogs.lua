@@ -24,7 +24,7 @@ local function translateText(text, target_language)
   local translation_history = {
     {
       role = "system",
-      content = "You are a helpful translation assistant. Provide direct translations without additional commentary."
+      content = "You are a helpful translation assistant. Provide direct translations without additional commentary. make it clear, understandable, and as natural as possible like native."
     },
     translation_message
   }
