@@ -40,9 +40,9 @@ local function summaryText(text, target_language)
   local target_language_isNullOrEmpty = isStringEmptyOrNil(target_language)
   local content = ""
   if target_language_isNullOrEmpty then
-    content = "Summarize the following text, highlighting the main points and key takeaways:" .. text
+    content = "Summarize the following text, highlighting the main points and key takeaways: " .. text
   else 
-    content = "Summarize the following text using ".. target_language .." language, highlighting the main points and key takeaways:" .. text
+    content = "Summarize the following text , highlighting the main points and key takeaways then translate to".. target_languange ..": " .. text
   end
   
   local summary_message = {
