@@ -16,6 +16,10 @@ else
   print("configuration.lua not found, skipping...")
 end
 
+local function isStringEmptyOrNil(str)
+    return str == nil or str == ""
+end
+
 local function translateText(text, target_language)
   local translation_message = {
     role = "user",
@@ -33,12 +37,14 @@ end
 
 
 local function summaryText(text, target_language)
-  target_languange_isNullOrEmpty = isStringEmptyOrNil(target_language)
-  content = ""
+  local target_language_isNullOrEmpty = isStringEmptyOrNil(target_language)
+  local content = ""
   if target_language_isNullOrEmpty then
     content = "Summarize the following text, highlighting the main points and key takeaways:" .. text
   else 
     content = "Summarize the following text using ".. target_language .." language, highlighting the main points and key takeaways:" .. text
+  end
+  
   local summary_message = {
     role = "user",
     content = content
