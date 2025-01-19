@@ -40,9 +40,9 @@ local function summaryText(text, target_language)
   local target_language_isNullOrEmpty = isStringEmptyOrNil(target_language)
   local content = ""
   if target_language_isNullOrEmpty then
-    content = "Summarize the following text, highlighting the main points and key takeaways: " .. text
+        content = "Create a concise summary capturing the key points of this text: " .. text
   else 
-    content = "Summarize the following text , highlighting the main points and key takeaways then translate to".. target_language ..": " .. text
+        content = "Create a concise summary in " .. target_language .. " language: " .. text
   end
   
   local summary_message = {
@@ -52,7 +52,7 @@ local function summaryText(text, target_language)
   local summary_history = {
     {
       role = "system",
-      content = "You are a helpful summary assistant. Provide direct summary without commentary. make it clear, understandable, and as natural as possible like native."
+      content = "Create clear and concise summaries focusing on essential information only."
     },
     summary_message
   }
@@ -190,7 +190,7 @@ local function showChatGPTDialog(ui, highlightedText, message_history)
   end
 
 
-  if CONFIGURATION and CONFIGURATION.features and CONFIGURATION.features.summary then
+  if CONFIGURATION and CONFIGURATION.features and (CONFIGURATION.features.summary==true) then
     table.insert(buttons, {
       text = _("Summary"),
       callback = function()
