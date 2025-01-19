@@ -42,7 +42,7 @@ local function summaryText(text, target_language)
   if target_language_isNullOrEmpty then
     content = "Summarize the following text, highlighting the main points and key takeaways: " .. text
   else 
-    content = "Summarize the following text , highlighting the main points and key takeaways then translate to".. target_languange ..": " .. text
+    content = "Summarize the following text , highlighting the main points and key takeaways then translate to".. target_language ..": " .. text
   end
   
   local summary_message = {
